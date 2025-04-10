@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signature Pad</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    canvas {
+      border: 2px solid #000;
+      touch-action: none;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Sign Below</h2>
+  <canvas id="signature" width="500" height="200"></canvas><br>
+
+  <button onclick="clearCanvas()">Clear</button>
+  <button onclick="downloadSignature()">Download</button>
+
+  <script>
+    const canvas = document.getElementById('signature');
+    const ctx = canvas.getContext('2d');
+
+    let drawing = false;
+
+    const startDraw = (e) => {
+      drawing = true;
+      draw(e);
+    };
+
+    const endDraw = () => {
+      drawing = false;
+      ctx.beginPath();
+    };
+
+    const draw = (e) => {
+      if (!drawing) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000';
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    };
+
+    // Mouse events
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mousemove', draw);
+
+    // Touch events
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchend', endDraw);
+    canvas.addEventListener('touchmove', draw);
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function downloadSignature() {
+      const link = document.createElement('a');
+      link.download = 'signature.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
